@@ -1,11 +1,23 @@
 <script setup>
 import JSONLab from './components/JSONLab.vue'
 import BHeader from './components/BHeader.vue'
+import { isAuthenticated } from './auth'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+const handleLogout = () => {
+  isAuthenticated.value = false
+  router.push('/login')
+}
 </script>
 
 <template>
   <header>
     <BHeader />
+    <div class="text-end me-4 mt-2">
+      <button v-if="isAuthenticated" class="btn btn-outline-danger btn-sm" @click="handleLogout">Logout</button>
+    </div>
   </header>
 
   <main>

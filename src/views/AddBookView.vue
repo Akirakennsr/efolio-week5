@@ -19,7 +19,7 @@
 import { ref } from 'vue';
 import { collection, addDoc } from "firebase/firestore";    
 import db from '../firebase/init.js';
-import BookList from '../components/BookList.vue';
+import BookList from '../views/BookList.vue';
 
 export default{
     setup() {

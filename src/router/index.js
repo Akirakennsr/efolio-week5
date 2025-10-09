@@ -7,6 +7,7 @@ import FirebaseSigninView from '@/views/FirebaseSigninView.vue'
 import FirebaseRegisterView from '@/views/FirebaseRegisterView.vue'
 import AddBookView from '@/views/AddBookView.vue'
 import BookListView from '@/views/BookList.vue'
+const labEnabled = import.meta.env.DEV && import.meta.env.VITE_SECURITY_LAB === 'true'
 
 const routes = [
   {
@@ -52,7 +53,13 @@ const routes = [
     }
   }
 ]
-
+if (labEnabled) {
+  routes.push({
+    path: '/__security',
+    name: 'SecurityLab',
+    component: () => import('../../lab/SecurityLab.vue')
+  })
+}
 const router = createRouter({
   history: createWebHistory(),
   routes

@@ -3,7 +3,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css'
 
 import appPkg from '../package.json';
-import { version as vueVersion } from 'vue';  // 这个保留没问题
+import { version as vueVersion } from 'vue';  
 
 
 import { createApp } from 'vue'

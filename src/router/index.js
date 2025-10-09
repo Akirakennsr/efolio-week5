@@ -7,9 +7,15 @@ import FirebaseSigninView from '@/views/FirebaseSigninView.vue'
 import FirebaseRegisterView from '@/views/FirebaseRegisterView.vue'
 import AddBookView from '@/views/AddBookView.vue'
 import BookListView from '@/views/BookList.vue'
+import GetBookCountView from '@/views/GetBookCountView.vue'
 const labEnabled = import.meta.env.DEV && import.meta.env.VITE_SECURITY_LAB === 'true'
 
 const routes = [
+  {
+    path: '/Getbookcount',
+    name: 'GetBookCount',
+    component: GetBookCountView
+  },
   {
     path:'/FireLogin',
     name:'FireLogin',

@@ -13,12 +13,15 @@
     "test:run": "vitest run",
     "test:ui": "vitest --ui",
     "test:p4": "vitest run lab/point4/tests/*.spec.js",
-    "test:p4:ui": "vitest --ui --root ."
+    "test:p4:ui": "vitest --ui --root .",
+    "start": "node server.js"
   },
   "dependencies": {
     "@primevue/themes": "^4.0.4",
+    "axios": "^1.12.2",
     "bootstrap": "^5.3.3",
     "dompurify": "^3.2.7",
+    "express": "^5.1.0",
     "firebase": "^12.3.0",
     "primevue": "^4.0.4",
     "vue": "^3.4.29",

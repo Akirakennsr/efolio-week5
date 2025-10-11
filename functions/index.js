@@ -15,6 +15,20 @@ const {onDocumentCreated} = require("firebase-functions/v2/firestore");
 
 admin.initializeApp();
 
+exports.getAllBooks = onRequest((req, res) => {
+  cors(req, res, async () => {
+    try {
+      const snapshot = await admin.firestore().collection("books").get();
+      const books = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      res.status(200).json(books);
+    } catch (error) {
+      res.status(500).send("Error fetching books");
+    }
+  });
+});
 
 exports.capitalizeBookFields = onDocumentCreated(
     "books/{bookId}",

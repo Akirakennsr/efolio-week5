@@ -1,6 +1,7 @@
-<script setup>
+<script>
 import JSONLab from './components/JSONLab.vue'
 import BHeader from './components/BHeader.vue'
+import CountBookAPI from './views/CountBookAPI.vue'
 import { isAuthenticated } from './auth'
 import { useRouter } from 'vue-router'
 
@@ -10,6 +11,26 @@ const handleLogout = () => {
   isAuthenticated.value = false
   router.push('/login')
 }
+
+export default {
+  name: 'App',
+  components: {
+    BHeader,
+    CountBookAPI
+  },
+  computed: {
+    showHeader() {
+      return this.$route.name !== 'Cou';
+    }
+ }
+  ,  
+  data() {
+    return {
+      isAuthenticated
+    }
+  }
+}
+
 </script>
 
 <template>

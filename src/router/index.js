@@ -8,9 +8,27 @@ import FirebaseRegisterView from '@/views/FirebaseRegisterView.vue'
 import AddBookView from '@/views/AddBookView.vue'
 import BookListView from '@/views/BookList.vue'
 import GetBookCountView from '@/views/GetBookCountView.vue'
+import WeatherView from '@/views/WeatherView.vue'
+import CountBookAPI from '@/views/CountBookAPI.vue'
+import GetAllBookAPI from '@/views/GetAllBookAPI.vue'
 const labEnabled = import.meta.env.DEV && import.meta.env.VITE_SECURITY_LAB === 'true'
 
 const routes = [
+  {
+    path: '/GetAllBookAPI',
+    name: 'GetAllBookAPI',
+    component: GetAllBookAPI
+  },
+  {
+    path: '/CountBookAPI',
+    name: 'CountBookAPI',
+    component: CountBookAPI
+  },
+  {
+    path: '/Weather',
+    name: 'Weather',
+    component: WeatherView
+  },
   {
     path: '/Getbookcount',
     name: 'GetBookCount',

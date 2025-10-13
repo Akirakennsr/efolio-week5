@@ -77,13 +77,7 @@ const routes = [
     }
   }
 ]
-if (labEnabled) {
-  routes.push({
-    path: '/__security',
-    name: 'SecurityLab',
-    component: () => import('../../lab/SecurityLab.vue')
-  })
-}
+
 const router = createRouter({
   history: createWebHistory(),
   routes

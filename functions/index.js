@@ -12,8 +12,82 @@ const {onRequest}= require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
 const cors = require("cors")({origin: true});
 const {onDocumentCreated} = require("firebase-functions/v2/firestore");
+const logger = require("firebase-functions/logger");
 
 admin.initializeApp();
+const db = admin.firestore();
+
+const sgMail = require("@sendgrid/mail");
+const functionsModule = require("firebase-functions");
+const SENDGRID_KEY = (functionsModule &&
+  functionsModule.sendgrid &&
+  functionsModule.sendgrid.key) ||
+  process.env.SENDGRID_API_KEY;
+if (SENDGRID_KEY) sgMail.setApiKey(SENDGRID_KEY);
+
+exports.sendEmail = onRequest((req, res) => {
+  cors(req, res, async () => {
+    const msg = {
+      to: "zqia0019@student.monash.edu", // 收件人：改成你能接收的邮箱
+      from: "qianzehao01@gmail.com", // 发件人：必须在 SendGrid 中验证
+      subject: "Sending with SendGrid is Fun",
+      text: "and easy to do anywhere, even with Node.js",
+      html: "<strong>and easy to do anywhere, even with Node.js</strong>",
+    };
+
+    sgMail
+        .send(msg)
+        .then(() => {
+          console.log("Email sent");
+          return res.status(200).json({
+            success: true, message: "Email sent"});
+        })
+        .catch((error) => {
+          console.error(error);
+          return res.status(500).json({
+            success: false, message: "Error sending email"});
+        });
+  });
+});
+
+
+exports.supportProject = onRequest((req, res) => {
+  return cors(req, res, async () => {
+    if (req.method !== "POST") {
+      return res.status(405).json({
+        ok: false, error: "Method Not Allowed"});
+    }
+    const {projectId} = req.body || {};
+    if (!projectId) {
+      return res.status(400).json({
+        ok: false, error: "Missing projectId"});
+    }
+    const projectRef = db.collection("donationProjects")
+        .doc(projectId.toString());
+    try {
+      // Use transaction to ensure atomic increment and to return new value
+      const result = await db.runTransaction(async (tx) => {
+        const snap = await tx.get(projectRef);
+        if (!snap.exists) throw new Error("Project not found");
+        const data = snap.data() || {};
+        const prev = typeof data.supportCount === "number" ?
+        data.supportCount : 0;
+        const next = prev + 1;
+        tx.update(projectRef, {supportCount: next});
+        return next;
+      });
+
+      return res.status(200).json({
+        ok: true, projectId, supportCount: result});
+    } catch (err) {
+      logger.error("supportProject error:", err && err.stack ?
+        err.stack : err);
+      const msg = err && err.message ? err.message : err;
+      return res.status(500).json({ok: false, error: msg});
+    }
+  });
+});
+
 
 exports.getAllBooks = onRequest((req, res) => {
   cors(req, res, async () => {
@@ -62,6 +136,8 @@ exports.countBooks = onRequest((req, res) => {
     }
   });
 });
+
+
 // For cost control, you can set the maximum number of containers that can be
 // running at the same time. This helps mitigate the impact of unexpected
 // traffic spikes by instead downgrading performance. This limit is a

@@ -27,26 +27,72 @@ if (SENDGRID_KEY) sgMail.setApiKey(SENDGRID_KEY);
 
 exports.sendEmail = onRequest((req, res) => {
   cors(req, res, async () => {
+    if (req.method !== "POST") {
+      return res.status(405).json({
+        success: false,
+        error: "Method Not Allowed. Use POST."});
+    }
+    const body = req.body || {};
+    const to = "zqia0019@student.monash.edu";
+    const from = "qianzehao01@gmail.com";
+    const subject = typeof
+    body.subject === "string" && body.subject.trim() ?
+    body.subject.trim() : null;
+    const text = typeof body.text === "string" ?
+    body.text : "";
+    const html = typeof body.html === "string" ?
+    body.html : null;
+    const attachments = Array.isArray(body.attachments) ?
+    body.attachments : [];
+    if (!subject) {
+      return res.status(400).json({
+        success: false, error: "Missing subject"});
+    }
     const msg = {
-      to: "zqia0019@student.monash.edu", // 收件人：改成你能接收的邮箱
-      from: "qianzehao01@gmail.com", // 发件人：必须在 SendGrid 中验证
-      subject: "Sending with SendGrid is Fun",
-      text: "and easy to do anywhere, even with Node.js",
-      html: "<strong>and easy to do anywhere, even with Node.js</strong>",
+      to,
+      from,
+      subject,
+      text,
     };
-
-    sgMail
-        .send(msg)
-        .then(() => {
-          console.log("Email sent");
-          return res.status(200).json({
-            success: true, message: "Email sent"});
-        })
-        .catch((error) => {
-          console.error(error);
-          return res.status(500).json({
-            success: false, message: "Error sending email"});
+    if (html) msg.html = html;
+    if (attachments.length) {
+      try {
+        msg.attachments = attachments.map((att) => {
+          let content = att.content || "";
+          if (typeof content !== "string") content = "";
+          const m = content.match(/^data:([\w/+.-]+);base64,(.*)$/);
+          if (m) content = m[2];
+          return {
+            content: content,
+            filename: att.filename || "attachment",
+            type: att.type || undefined,
+            disposition: "attachment",
+          };
         });
+      } catch (err) {
+        console.error("attachment parse error", err);
+        return res.status(400).json({
+          success: false, error: "Invalid attachments"});
+      }
+    }
+    try {
+      if (!SENDGRID_KEY) {
+        console.error("SENDGRID_API_KEY not configured");
+        return res.status(500).json({
+          success: false, error: "Mail service not configured"});
+      }
+      await sgMail.send(msg);
+      console.log("Email sent");
+      return res.status(200).json({
+        success: true, message: "Email sent"});
+    } catch (error) {
+      console.error("sendEmail error", error && (error.response || error));
+      const errMsg = (error && error.message) ||
+      (error && error.toString && error.toString()) ||
+      "Error sending email";
+      return res.status(500).json({
+        success: false, error: errMsg});
+    }
   });
 });
 

@@ -4,8 +4,6 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 
 import appPkg from '../package.json';
 import { version as vueVersion } from 'vue';  
-
-
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'

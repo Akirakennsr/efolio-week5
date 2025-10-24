@@ -15,7 +15,7 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
-  test: { environment: 'jsdom', globals: true },
+  // test: { environment: 'jsdom', globals: true },
     base: process.env.NODE_ENV === 'production'
     ? '/<efolio-week5>/'
     : '/'

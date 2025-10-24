@@ -6,17 +6,14 @@
  *
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
-
 const {setGlobalOptions}= require("firebase-functions");
 const {onRequest}= require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
 const cors = require("cors")({origin: true});
 const {onDocumentCreated} = require("firebase-functions/v2/firestore");
 const logger = require("firebase-functions/logger");
-
 admin.initializeApp();
 const db = admin.firestore();
-
 const sgMail = require("@sendgrid/mail");
 const functionsModule = require("firebase-functions");
 const SENDGRID_KEY = (functionsModule &&
@@ -24,7 +21,6 @@ const SENDGRID_KEY = (functionsModule &&
   functionsModule.sendgrid.key) ||
   process.env.SENDGRID_API_KEY;
 if (SENDGRID_KEY) sgMail.setApiKey(SENDGRID_KEY);
-
 exports.sendEmail = onRequest((req, res) => {
   cors(req, res, async () => {
     if (req.method !== "POST") {
@@ -95,8 +91,6 @@ exports.sendEmail = onRequest((req, res) => {
     }
   });
 });
-
-
 exports.supportProject = onRequest((req, res) => {
   return cors(req, res, async () => {
     if (req.method !== "POST") {
@@ -133,8 +127,6 @@ exports.supportProject = onRequest((req, res) => {
     }
   });
 });
-
-
 exports.getAllBooks = onRequest((req, res) => {
   cors(req, res, async () => {
     try {
@@ -149,7 +141,6 @@ exports.getAllBooks = onRequest((req, res) => {
     }
   });
 });
-
 exports.capitalizeBookFields = onDocumentCreated(
     "books/{bookId}",
     async (event) => {
@@ -167,8 +158,6 @@ exports.capitalizeBookFields = onDocumentCreated(
       }
       await admin.firestore().collection("books").doc(bookId).update(newData);
     });
-
-
 exports.countBooks = onRequest((req, res) => {
   cors(req, res, async () => {
     try {
@@ -183,6 +172,39 @@ exports.countBooks = onRequest((req, res) => {
   });
 });
 
+exports.validateComment = onRequest((req, res) => {
+  return cors(req, res, async () => {
+    if (req.method !== "POST") {
+      return res.status(405).json({
+        ok: false, error: "Method Not Allowed"});
+    }
+    const {text} = req.body || {};
+    if (typeof text !== "string" || !
+    text.trim()) {
+      return res.status(400).json({
+        ok: false, error: "Missing text"});
+    }
+    try {
+      const snap = await db.collection("sensitiveWords").get();
+      const words = snap.docs.map((d) => (d.data() &&
+      d.data().word) || "").filter(Boolean);
+      const lowered = text.toLowerCase();
+      const found = words.find((w) =>
+        lowered.includes(String(w).toLowerCase()));
+      if (found) {
+        return res.status(200).json({
+          ok: true, allowed: false,
+          reason: `Contains sensitive word: ${found}`});
+      }
+      return res.status(200).json({
+        ok: true, allowed: true});
+    } catch (err) {
+      console.error("validateComment error", err);
+      return res.status(500).json({
+        ok: false, error: "Server error"});
+    }
+  });
+});
 
 // For cost control, you can set the maximum number of containers that can be
 // running at the same time. This helps mitigate the impact of unexpected

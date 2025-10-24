@@ -17,3 +17,9 @@ export default defineConfig({
   },
   test: { environment: 'jsdom', globals: true }
 })
+
+module.exports = {
+  publicPath: process.env.NODE_ENV === 'production'
+    ? '/<https://github.com/Akirakennsr/efolio-week5>/'
+    : '/'
+}

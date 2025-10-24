@@ -23,6 +23,6 @@ export default defineConfig({
 
 // module.exports = {
 //   publicPath: process.env.NODE_ENV === 'production'
-//     ? '/<https://github.com/Akirakennsr/efolio-week5>/'
+//     ? '/efolio-week5/'
 //     : '/'
 // }
